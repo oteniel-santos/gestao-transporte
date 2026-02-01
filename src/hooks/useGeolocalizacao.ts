@@ -5,8 +5,12 @@ export function useGeolocalizacao() {
   const [latitude, setLatitude] = useState<number | null>(null);
   const [longitude, setLongitude] = useState<number | null>(null);
   const [erro, setErro] = useState<Errors>({});
+  const [tentouAutomatico, setTentouAutomatico] = useState(false);
+  const [carregando, setCarregando] = useState(false);
 
-  const obterLocalizacao = () => {
+  const obterLocalizacao = (automatico = false) => {
+    if (automatico) setTentouAutomatico(true);
+    setCarregando(true);
     if (!navigator.geolocation) {
       setErro((e) => ({
         ...e,
@@ -19,18 +23,29 @@ export function useGeolocalizacao() {
         setLatitude(pos.coords.latitude);
         setLongitude(pos.coords.longitude);
         setErro((e) => ({ ...e, localizacao: undefined }));
+        setCarregando(false);
       },
-      () =>
+      () => {
         setErro((e) => ({
           ...e,
           localizacao: "Permissão negada para obter a localização",
-        })),
+        }));
+        setCarregando(false);
+      },
     );
   };
 
   useEffect(() => {
-    obterLocalizacao();
+    obterLocalizacao(true);
   }, []);
 
-  return { latitude, longitude, erro, obterLocalizacao };
+  return {
+    latitude,
+    longitude,
+    erro,
+    obterLocalizacao,
+    localizacaoErro: erro.localizacao,
+    tentouAutomatico,
+    carregando,
+  };
 }

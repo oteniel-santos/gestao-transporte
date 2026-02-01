@@ -47,19 +47,20 @@ export default function MapaLinha({
   pontoCasa?: { lat: number; lng: number };
   tipoMapa: "mapa" | "satelite";
 }) {
+  if (!pontoCasa) return null;
+
   const urlTile =
     tipoMapa === "mapa"
       ? "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       : "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
+
   return (
-    <MapContainer
-      center={pontoCasa || [0, 0]}
-      zoom={13}
-      style={{ height: "100%", width: "100%" }}
-    >
-      <TileLayer url={urlTile} />
-      {rota.length > 0 && <Polyline positions={rota} color="blue" />}
-      {pontoCasa && <Marker position={pontoCasa} icon={defaultIcon} />}
+    <MapContainer center={pontoCasa} zoom={13} className="w-full h-full ">
+      {urlTile && <TileLayer url={urlTile} />}
+      {rota.length > 0 && (
+        <Polyline positions={rota.map((p) => [p.lat, p.lng])} color="blue" />
+      )}
+      <Marker position={[pontoCasa.lat, pontoCasa.lng]} icon={defaultIcon} />
       <AjustarMapa rota={rota} pontoCasa={pontoCasa} />
     </MapContainer>
   );
