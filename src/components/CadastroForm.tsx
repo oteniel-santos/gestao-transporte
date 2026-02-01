@@ -14,6 +14,7 @@ import { InputFloating } from "./InputFloating";
 import { useRouter } from "next/navigation";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import { getDB } from "@/lib/offline-db";
+import { Spinner } from "@/components/Spinner";
 
 const MapaLinha = dynamic(() => import("./MapaLinha"), { ssr: false });
 
@@ -420,9 +421,29 @@ ${responsavel.toUpperCase()} - ${endereco.toUpperCase()} - ${d?.nome}
 
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white p-3 rounded"
+          disabled={salvando}
+          className={`
+    w-full
+    flex
+    items-center
+    justify-center
+    gap-2
+    bg-blue-600
+    text-white
+    p-3
+    rounded
+    transition
+    ${salvando ? "opacity-70 cursor-not-allowed" : "hover:bg-blue-700"}
+  `}
         >
-          {salvando ? "Enviando..." : "Enviar"}
+          {salvando ? (
+            <>
+              <Spinner />
+              Enviando...
+            </>
+          ) : (
+            "Enviar"
+          )}
         </button>
       </form>
       <p className="mt-10 text-center text-sm/6 text-gray-400">
