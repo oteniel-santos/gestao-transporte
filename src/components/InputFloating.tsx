@@ -1,22 +1,19 @@
-import { InputHTMLAttributes } from "react";
+import { InputHTMLAttributes, forwardRef } from "react";
 
 interface InputFloatingProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string;
   error?: string;
 }
 
-export function InputFloating({
-  label,
-  error,
-  className = "",
-  ...props
-}: InputFloatingProps) {
-  return (
-    <div className="relative w-full">
-      <input
-        {...props}
-        placeholder=" "
-        className={`
+export const InputFloating = forwardRef<HTMLInputElement, InputFloatingProps>(
+  function InputFloating({ label, error, className = "", ...props }, ref) {
+    return (
+      <div className="relative w-full">
+        <input
+          ref={ref}
+          {...props}
+          placeholder=" "
+          className={`
           peer
           w-full
           uppercase
@@ -33,10 +30,10 @@ export function InputFloating({
           focus:border-indigo-500
           ${className}
         `}
-      />
+        />
 
-      <label
-        className={`
+        <label
+          className={`
           absolute
           left-3
           top-1/2
@@ -56,11 +53,12 @@ export function InputFloating({
           peer-not-placeholder-shown:top-1
           peer-not-placeholder-shown:text-xs
         `}
-      >
-        {label}
-      </label>
+        >
+          {label}
+        </label>
 
-      {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
-    </div>
-  );
-}
+        {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
+      </div>
+    );
+  },
+);

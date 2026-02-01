@@ -8,6 +8,7 @@ type AlunosFormProps = {
   filhos: Filho[];
   setFilhos: Dispatch<SetStateAction<Filho[]>>;
   errors: any;
+  alunoRefs: React.MutableRefObject<(HTMLDivElement | null)[]>;
   limparErroFilho: (index: number, campo: keyof Filho) => void;
 };
 
@@ -16,6 +17,7 @@ export default function AlunosForm({
   setFilhos,
   errors,
   limparErroFilho,
+  alunoRefs,
 }: AlunosFormProps) {
   const adicionarFilho = () => {
     setFilhos([
@@ -25,6 +27,7 @@ export default function AlunosForm({
   };
   const removerFilho = (index: number) => {
     setFilhos(filhos.filter((_, i) => i !== index));
+    alunoRefs.current.splice(index, 1);
   };
   const atualizarFilho = (index: number, campo: keyof Filho, valor: any) => {
     const novaLista = [...filhos];
@@ -37,6 +40,9 @@ export default function AlunosForm({
       {filhos.map((filho, index) => (
         <div
           key={index}
+          ref={(el) => {
+            alunoRefs.current[index] = el;
+          }}
           className="relative border border-gray-200 bg-white rounded-lg p-4 shadow-sm pt-8"
         >
           <div>
@@ -68,11 +74,12 @@ export default function AlunosForm({
                       focus:-outline-offset-2
                       focus:outline-indigo-500 
                       sm:text-sm/6
-                     ${errors?.filhos?.[index]?.escola ? "border-red-500" : ""} `}
+                     ${errors?.filhos?.[index]?.escolaId ? "border-red-500" : ""} `}
               value={filho.escolaId}
-              onChange={(e) =>
-                atualizarFilho(index, "escolaId", Number(e.target.value))
-              }
+              onChange={(e) => {
+                atualizarFilho(index, "escolaId", Number(e.target.value));
+                limparErroFilho(index, "escolaId");
+              }}
             >
               <option value="">Selecione a escola</option>
               {ESCOLAS.map((e) => (
@@ -109,7 +116,10 @@ export default function AlunosForm({
                      ${errors?.filhos?.[index]?.turma ? "border-red-500" : ""} `}
               disabled={!filho.escolaId}
               value={filho.turma}
-              onChange={(e) => atualizarFilho(index, "turma", e.target.value)}
+              onChange={(e) => {
+                atualizarFilho(index, "turma", e.target.value);
+                limparErroFilho(index, "turma");
+              }}
             >
               <option value="">
                 {filho.escolaId

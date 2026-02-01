@@ -11,10 +11,12 @@ import { useDetectarLinha } from "@/hooks/useDetectarLinha";
 import SectionTitle from "./SectionTitle";
 import AlunosForm from "./AlunosForm";
 import { InputFloating } from "./InputFloating";
+import { useRouter } from "next/navigation";
 
 const MapaLinha = dynamic(() => import("./MapaLinha"), { ssr: false });
 
 export default function CadastroForm() {
+  const router = useRouter();
   const [responsavel, setResponsavel] = useState("");
   const [endereco, setEndereco] = useState("");
   const [linha, setLinha] = useState<number | "">("");
@@ -60,6 +62,11 @@ export default function CadastroForm() {
     });
   };
 
+  const responsavelRef = useRef<HTMLInputElement>(null);
+  const enderecoRef = useRef<HTMLInputElement>(null);
+  const linhaRef = useRef<HTMLInputElement>(null);
+  const alunoRefs = useRef<(HTMLDivElement | null)[]>([]);
+
   const linhaDetectadaRef = useRef(false);
   useEffect(() => {
     if (!latitude || !longitude) return;
@@ -75,6 +82,14 @@ export default function CadastroForm() {
       }
     });
   }, [latitude, longitude]);
+
+  const limparFormulario = () => {
+    setResponsavel("");
+    setEndereco("");
+    setLinha("");
+    setFilhos([{ nome: "", escolaId: "", escolaNome: "", turma: "" }]);
+    setErrors({});
+  };
 
   // VALIDAR FORMULÁRIO
   function validarFormulario(): boolean {
@@ -99,18 +114,53 @@ export default function CadastroForm() {
     filhos.forEach((f, i) => {
       const erroFilho: any = {};
       if (!f.nome) erroFilho.nome = "Informe o nome do aluno";
-      if (!f.escolaId) erroFilho.escola = "Selecione a escola";
+      if (!f.escolaId) erroFilho.escolaId = "Selecione a escola";
       if (!f.turma) erroFilho.turma = "Informe a turma";
       novosErros.filhos![i] = erroFilho;
     });
 
+    setErrors(novosErros);
+
+    // 👇 SCROLL PARA O PRIMEIRO ERRO
+    setTimeout(() => {
+      if (novosErros.responsavel) {
+        responsavelRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+        responsavelRef.current?.focus();
+        return;
+      }
+
+      if (novosErros.endereco) {
+        enderecoRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+        enderecoRef.current?.focus();
+        return;
+      }
+
+      // 3️⃣ PRIMEIRO FILHO COM ERRO
+      const indiceFilhoComErro = novosErros.filhos?.findIndex(
+        (f) => f && Object.keys(f).length > 0,
+      );
+
+      if (indiceFilhoComErro !== undefined && indiceFilhoComErro !== -1) {
+        alunoRefs.current[indiceFilhoComErro]?.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+        return;
+      }
+    }, 100);
+
     const temErro =
       novosErros.responsavel ||
       novosErros.linha ||
-      // novosErros.localizacao ||
+      novosErros.endereco ||
       novosErros.filhos!.some((f) => Object.keys(f).length > 0);
 
-    setErrors(novosErros);
     return !temErro;
   }
 
@@ -141,18 +191,22 @@ export default function CadastroForm() {
         filhos,
       }),
     });
+
     const data = await res.json();
     if (data.ok) {
       const d = LINHAS.find((l) => l.id === Number(linha));
       const msg = `
 
-*CADASTRO TRANSPORTE ESCOLAR-2026*
-*Responsável:* ${responsavel.toUpperCase()}
-*Endereço:* ${endereco.toUpperCase()}
-🚌 *Linha:* ${d?.nome}
-🧑‍✈️ *Motorista:* ${d?.motorista}
-📞 *Fone Motorista:* ${d?.telefone}
-( Clique no número acima para falar com o motorista) 
+🚍*CADASTRO TRANSPORTE ESCOLAR-2026*
+
+  *Responsável:* ${responsavel.toUpperCase()}
+  *Endereço:* ${endereco.toUpperCase()}
+
+*DADOS DA LINHA*
+  🚌 *Linha:* ${d?.nome}
+  🧑‍✈️ *Motorista:* ${d?.motorista}
+  📞 *Fone Motorista:* ${d?.telefone}
+  ( Clique no número acima para falar com o motorista) 
 
 *LOCALIZAÇÃO* 
  - Latitude: ${latitude ? latitude : "Não Informada"}
@@ -161,11 +215,23 @@ export default function CadastroForm() {
 *ALUNOS:*
 ${filhos.map((f, i) => `${i + 1} - ${f.nome.toUpperCase()} (${getNomeEscola(f.escolaId)} - ${f.turma})`).join("\n")}
 ------------------------
-CONTATO RESPONSAVEL
+📢 CONTATO RESPONSAVEL
 ${responsavel.toUpperCase()} - ${endereco.toUpperCase()} - ${d?.nome}
 
 `;
-      window.location.href = `https://wa.me/5566992028229?text=${encodeURIComponent(msg)}`;
+
+      // window.location.href = `https://wa.me/5566992028229?text=${encodeURIComponent(msg)}`;
+
+      window.open(
+        `https://wa.me/5566992028229?text=${encodeURIComponent(msg)}`,
+        "_blank",
+      );
+
+      limparFormulario();
+
+      setTimeout(() => {
+        router.replace("/sucesso");
+      }, 300);
     }
     setSalvando(false);
   };
@@ -201,6 +267,7 @@ ${responsavel.toUpperCase()} - ${endereco.toUpperCase()} - ${d?.nome}
         <div className="space-y-1 relative">
           <InputFloating
             label="Nome do Responsável"
+            ref={responsavelRef}
             value={responsavel}
             error={errors.responsavel}
             onChange={(e) => {
@@ -212,6 +279,7 @@ ${responsavel.toUpperCase()} - ${endereco.toUpperCase()} - ${d?.nome}
         <div>
           <InputFloating
             label="Endereço (nome da Fazenda, Sitio ou Chácara)"
+            ref={enderecoRef}
             value={endereco}
             error={errors.endereco}
             onChange={(e) => {
@@ -227,6 +295,7 @@ ${responsavel.toUpperCase()} - ${endereco.toUpperCase()} - ${d?.nome}
             filhos={filhos}
             setFilhos={setFilhos}
             errors={errors}
+            alunoRefs={alunoRefs}
             limparErroFilho={limparErroFilho}
           />
         </div>
