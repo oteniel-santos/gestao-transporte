@@ -267,7 +267,7 @@ ${responsavel.toUpperCase()} - ${endereco.toUpperCase()} - ${d?.nome}
           )}
           {rotaLinha.length > 0 && (
             <p className="text-xs ">
-              Identidicamos automaticamente sua linha. Caso esteja incorreta
+              Identificamos automaticamente sua linha. Caso esteja incorreta
               você pode alterar.
             </p>
           )}
