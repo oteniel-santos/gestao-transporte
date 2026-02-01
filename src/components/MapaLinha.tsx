@@ -75,25 +75,27 @@ export default function MapaLinha({
         </div>
       )}
 
-      <MapContainer
-        center={pontoCasa}
-        zoom={13}
-        className="w-full h-full"
-        scrollWheelZoom={mapaAtivo}
-        dragging={mapaAtivo}
-        doubleClickZoom={mapaAtivo}
-        touchZoom={mapaAtivo}
-        boxZoom={mapaAtivo}
-        keyboard={mapaAtivo}
+      <div
+        className={`w-full h-full ${
+          mapaAtivo ? "pointer-events-auto" : "pointer-events-none"
+        }`}
       >
-        {urlTile && <TileLayer url={urlTile} />}
-        {rota.length > 0 && (
-          <Polyline positions={rota.map((p) => [p.lat, p.lng])} color="blue" />
-        )}
-        <Marker position={[pontoCasa.lat, pontoCasa.lng]} icon={defaultIcon} />
+        <MapContainer center={pontoCasa} zoom={13} className="w-full h-full">
+          {urlTile && <TileLayer url={urlTile} />}
+          {rota.length > 0 && (
+            <Polyline
+              positions={rota.map((p) => [p.lat, p.lng])}
+              color="blue"
+            />
+          )}
+          <Marker
+            position={[pontoCasa.lat, pontoCasa.lng]}
+            icon={defaultIcon}
+          />
 
-        <AjustarMapa rota={rota} pontoCasa={pontoCasa} />
-      </MapContainer>
+          <AjustarMapa rota={rota} pontoCasa={pontoCasa} />
+        </MapContainer>
+      </div>
     </div>
   );
 }
