@@ -12,10 +12,13 @@ import SectionTitle from "./SectionTitle";
 import AlunosForm from "./AlunosForm";
 import { InputFloating } from "./InputFloating";
 import { useRouter } from "next/navigation";
+import { useOnlineStatus } from "@/hooks/useOnlineStatus";
+import { getDB } from "@/lib/offline-db";
 
 const MapaLinha = dynamic(() => import("./MapaLinha"), { ssr: false });
 
 export default function CadastroForm() {
+  const online = useOnlineStatus;
   const router = useRouter();
   const [responsavel, setResponsavel] = useState("");
   const [endereco, setEndereco] = useState("");
@@ -179,6 +182,7 @@ export default function CadastroForm() {
     e.preventDefault();
     if (!validarFormulario()) return;
     setSalvando(true);
+
     const res = await fetch("/api/cadastro", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
