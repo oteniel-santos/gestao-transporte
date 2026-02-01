@@ -3,6 +3,7 @@
   "short_name": "Transporte Escolar",
   "description": "Cadastro e gestão do transporte escolar do município de Novo Mundo/MT",
   "start_url": "/",
+  "lang": "pt-BR",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#0f766e",
