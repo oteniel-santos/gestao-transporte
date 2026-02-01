@@ -267,11 +267,7 @@ ${responsavel.toUpperCase()} - ${endereco.toUpperCase()} - ${d?.nome}
       </div>
 
       <form onSubmit={enviar} className="space-y-6 mt-6">
-        <h2 className="text-xl font-semibold uppercase text-black">
-          Responsável
-        </h2>
         <SectionTitle number={1} title="Responsável" />
-
         <div className="space-y-1 relative">
           <InputFloating
             label="Nome do Responsável"

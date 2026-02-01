@@ -8,7 +8,7 @@ import {
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const defaultIcon = new L.Icon({
   iconUrl: "/leaflet/marker-icon.png",
@@ -49,19 +49,51 @@ export default function MapaLinha({
 }) {
   if (!pontoCasa) return null;
 
+  const [mapaAtivo, setMapaAtivo] = useState(false);
+
   const urlTile =
     tipoMapa === "mapa"
       ? "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       : "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
 
   return (
-    <MapContainer center={pontoCasa} zoom={13} className="w-full h-full ">
-      {urlTile && <TileLayer url={urlTile} />}
-      {rota.length > 0 && (
-        <Polyline positions={rota.map((p) => [p.lat, p.lng])} color="blue" />
+    <div className="relative w-full h-full">
+      {/* OVERLAY */}
+      {!mapaAtivo && (
+        <div
+          onClick={() => setMapaAtivo(true)}
+          className="
+          absolute inset-0 z-10
+          flex items-center justify-center
+          bg-black/30
+          text-white text-sm font-medium
+          cursor-pointer
+          select-none
+        "
+        >
+          👆 Toque no mapa para mover
+        </div>
       )}
-      <Marker position={[pontoCasa.lat, pontoCasa.lng]} icon={defaultIcon} />
-      <AjustarMapa rota={rota} pontoCasa={pontoCasa} />
-    </MapContainer>
+
+      <MapContainer
+        center={pontoCasa}
+        zoom={13}
+        className="w-full h-full"
+        scrollWheelZoom={mapaAtivo}
+        dragging={mapaAtivo}
+        doubleClickZoom={mapaAtivo}
+        touchZoom={mapaAtivo}
+        boxZoom={mapaAtivo}
+        keyboard={mapaAtivo}
+      >
+        {urlTile && <TileLayer url={urlTile} />}
+        {rota.length > 0 && (
+          <Polyline positions={rota.map((p) => [p.lat, p.lng])} color="blue" />
+        )}
+        <Marker position={[pontoCasa.lat, pontoCasa.lng]} icon={defaultIcon} />
+
+        <AjustarMapa rota={rota} pontoCasa={pontoCasa} />
+      </MapContainer>
+    </div>
   );
 }
