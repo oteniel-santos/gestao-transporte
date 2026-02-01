@@ -105,6 +105,38 @@ function ControleInteracaoMapa({ ativo }: { ativo: boolean }) {
   return null;
 }
 
+function DesativarAoClicarFora({
+  ativo,
+  onDesativar,
+}: {
+  ativo: boolean;
+  onDesativar: () => void;
+}) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (!ativo) return;
+
+    const container = map.getContainer();
+
+    const handler = (e: Event) => {
+      if (!container.contains(e.target as Node)) {
+        onDesativar();
+      }
+    };
+
+    document.addEventListener("mousedown", handler);
+    document.addEventListener("touchstart", handler);
+
+    return () => {
+      document.removeEventListener("mousedown", handler);
+      document.removeEventListener("touchstart", handler);
+    };
+  }, [ativo, map, onDesativar]);
+
+  return null;
+}
+
 export default function MapaLinha({
   rota,
   pontoCasa,
@@ -140,6 +172,11 @@ export default function MapaLinha({
         <OverlayInteracaoMapa
           ativo={mapaAtivo}
           onAtivar={() => setMapaAtivo(true)}
+        />
+
+        <DesativarAoClicarFora
+          ativo={mapaAtivo}
+          onDesativar={() => setMapaAtivo(false)}
         />
         {/* alteracao */}
       </MapContainer>
