@@ -38,6 +38,73 @@ function AjustarMapa({
   return null;
 }
 
+function OverlayInteracaoMapa({
+  ativo,
+  onAtivar,
+}: {
+  ativo: boolean;
+  onAtivar: () => void;
+}) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (ativo) return;
+
+    const container = L.DomUtil.create("div", "leaflet-overlay-interacao");
+
+    container.innerHTML = `
+      <div style="
+        position:absolute;
+        inset:0;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        background:rgba(0,0,0,0.35);
+        color:white;
+        font-size:14px;
+        font-weight:500;
+        cursor:pointer;
+        z-index:1000;
+        user-select:none;
+      ">
+        👆 Toque no mapa para mover
+      </div>
+    `;
+
+    container.onclick = () => {
+      onAtivar();
+    };
+
+    map.getContainer().appendChild(container);
+
+    return () => {
+      container.remove();
+    };
+  }, [ativo, map, onAtivar]);
+
+  return null;
+}
+
+function ControleInteracaoMapa({ ativo }: { ativo: boolean }) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (ativo) {
+      map.dragging.enable();
+      map.touchZoom.enable();
+      map.doubleClickZoom.enable();
+      map.scrollWheelZoom.enable();
+    } else {
+      map.dragging.disable();
+      map.touchZoom.disable();
+      map.doubleClickZoom.disable();
+      map.scrollWheelZoom.disable();
+    }
+  }, [ativo, map]);
+
+  return null;
+}
+
 export default function MapaLinha({
   rota,
   pontoCasa,
@@ -58,44 +125,24 @@ export default function MapaLinha({
 
   return (
     <div className="relative w-full h-full">
-      {/* OVERLAY */}
-      {!mapaAtivo && (
-        <div
-          onClick={() => setMapaAtivo(true)}
-          className="
-          absolute inset-0 z-10
-          flex items-center justify-center
-          bg-black/30
-          text-white text-sm font-medium
-          cursor-pointer
-          select-none
-        "
-        >
-          👆 Toque no mapa para mover
-        </div>
-      )}
+      <MapContainer center={pontoCasa} zoom={13} className="w-full h-full">
+        {urlTile && <TileLayer url={urlTile} />}
+        {rota.length > 0 && (
+          <Polyline positions={rota.map((p) => [p.lat, p.lng])} color="blue" />
+        )}
+        <Marker position={[pontoCasa.lat, pontoCasa.lng]} icon={defaultIcon} />
 
-      <div
-        className={`w-full h-full ${
-          mapaAtivo ? "pointer-events-auto" : "pointer-events-none"
-        }`}
-      >
-        <MapContainer center={pontoCasa} zoom={13} className="w-full h-full">
-          {urlTile && <TileLayer url={urlTile} />}
-          {rota.length > 0 && (
-            <Polyline
-              positions={rota.map((p) => [p.lat, p.lng])}
-              color="blue"
-            />
-          )}
-          <Marker
-            position={[pontoCasa.lat, pontoCasa.lng]}
-            icon={defaultIcon}
-          />
+        <AjustarMapa rota={rota} pontoCasa={pontoCasa} />
 
-          <AjustarMapa rota={rota} pontoCasa={pontoCasa} />
-        </MapContainer>
-      </div>
+        {/* alteracao */}
+
+        <ControleInteracaoMapa ativo={mapaAtivo} />
+        <OverlayInteracaoMapa
+          ativo={mapaAtivo}
+          onAtivar={() => setMapaAtivo(true)}
+        />
+        {/* alteracao */}
+      </MapContainer>
     </div>
   );
 }
