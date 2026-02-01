@@ -24,7 +24,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR">
+    <html lang="pt">
       <head>
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#0f766e" />
