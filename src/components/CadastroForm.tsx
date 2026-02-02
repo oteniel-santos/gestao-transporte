@@ -42,6 +42,7 @@ export default function CadastroForm() {
     tentouAutomatico,
     carregando,
     obterLocalizacao,
+    atualizarPosicaoManual,
   } = useGeolocalizacao();
   const { detectarLinhaPorGPX } = useDetectarLinha();
 
@@ -372,6 +373,7 @@ ${responsavel.toUpperCase()} - ${endereco.toUpperCase()} - ${d?.nome}
               rota={rotaLinha}
               pontoCasa={pontoCasa}
               tipoMapa={tipoMapa}
+              atualizarPosicaoManual={atualizarPosicaoManual}
             />
           ) : (
             <p className="text-center px-4">
