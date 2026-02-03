@@ -12,14 +12,11 @@ import SectionTitle from "./SectionTitle";
 import AlunosForm from "./AlunosForm";
 import { InputFloating } from "./InputFloating";
 import { useRouter } from "next/navigation";
-import { useOnlineStatus } from "@/hooks/useOnlineStatus";
-import { getDB } from "@/lib/offline-db";
 import { Spinner } from "@/components/Spinner";
 
 const MapaLinha = dynamic(() => import("./MapaLinha"), { ssr: false });
 
 export default function CadastroForm() {
-  const online = useOnlineStatus;
   const router = useRouter();
   const [responsavel, setResponsavel] = useState("");
   const [endereco, setEndereco] = useState("");
@@ -180,67 +177,118 @@ export default function CadastroForm() {
     }
   }, [linha]);
 
+  //   const enviar = async (e: React.FormEvent) => {
+  //     e.preventDefault();
+  //     if (!validarFormulario()) return;
+  //     setSalvando(true);
+
+  //     const res = await fetch("/api/cadastro", {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({
+  //         responsavel,
+  //         endereco,
+  //         linha,
+  //         latitude,
+  //         longitude,
+  //         filhos,
+  //       }),
+  //     });
+
+  //     const data = await res.json();
+  //     if (data.ok) {
+  //       const d = LINHAS.find((l) => l.id === Number(linha));
+  //       const msg = `
+
+  // 🚍*CADASTRO TRANSPORTE ESCOLAR-2026*
+
+  //   *Responsável:* ${responsavel.toUpperCase()}
+  //   *Endereço:* ${endereco.toUpperCase()}
+
+  // *DADOS DA LINHA*
+  //   🚌 *Linha:* ${d?.nome}
+  //   🧑‍✈️ *Motorista:* ${d?.motorista}
+  //   📞 *Fone Motorista:* ${d?.telefone}
+  //   ( Clique no número acima para falar com o motorista)
+
+  // *LOCALIZAÇÃO*
+  //  - Latitude: ${latitude ? latitude : "Não Informada"}
+  //  - Longitude: ${longitude ? longitude : "Não Informada"}
+
+  // *ALUNOS:*
+  // ${filhos.map((f, i) => `${i + 1} - ${f.nome.toUpperCase()} (${getNomeEscola(f.escolaId)} - ${f.turma})`).join("\n")}
+  // ------------------------
+  // 📢 CONTATO RESPONSAVEL
+  // ${responsavel.toUpperCase()} - ${endereco.toUpperCase()} - ${d?.nome}
+
+  // `;
+
+  //       // window.location.href = `https://wa.me/5566992028229?text=${encodeURIComponent(msg)}`;
+
+  //       window.open(
+  //         `https://wa.me/5566992028229?text=${encodeURIComponent(msg)}`,
+  //         "_blank",
+  //       );
+
+  //       limparFormulario();
+
+  //       setTimeout(() => {
+  //         router.replace("/sucesso");
+  //       }, 300);
+  //     }
+  //     setSalvando(false);
+  //   };
+
+  //NOVA FUNÇÃO - ENVIAR COM FIREBASE
+
   const enviar = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validarFormulario()) return;
+
     setSalvando(true);
 
-    const res = await fetch("/api/cadastro", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        responsavel,
-        endereco,
-        linha,
-        latitude,
-        longitude,
-        filhos,
-      }),
-    });
+    try {
+      const res = await fetch("/api/cadastro", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          responsavel,
+          endereco,
+          linha,
+          latitude,
+          longitude,
+          filhos,
+        }),
+      });
 
-    const data = await res.json();
-    if (data.ok) {
-      const d = LINHAS.find((l) => l.id === Number(linha));
-      const msg = `
+      console.log("STATUS API:", res.status);
 
-🚍*CADASTRO TRANSPORTE ESCOLAR-2026*
 
-  *Responsável:* ${responsavel.toUpperCase()}
-  *Endereço:* ${endereco.toUpperCase()}
 
-*DADOS DA LINHA*
-  🚌 *Linha:* ${d?.nome}
-  🧑‍✈️ *Motorista:* ${d?.motorista}
-  📞 *Fone Motorista:* ${d?.telefone}
-  ( Clique no número acima para falar com o motorista) 
+      const data = await res.json();
+      console.log("RETORNO API:", data);
 
-*LOCALIZAÇÃO* 
- - Latitude: ${latitude ? latitude : "Não Informada"}
- - Longitude: ${longitude ? longitude : "Não Informada"}
 
-*ALUNOS:*
-${filhos.map((f, i) => `${i + 1} - ${f.nome.toUpperCase()} (${getNomeEscola(f.escolaId)} - ${f.turma})`).join("\n")}
-------------------------
-📢 CONTATO RESPONSAVEL
-${responsavel.toUpperCase()} - ${endereco.toUpperCase()} - ${d?.nome}
+            if (!res.ok) {
+        throw new Error("Erro ao salvar cadastro");
+      }
 
-`;
+      if (!data?.id) {
+        throw new Error("ID não retornado pela API");
+      }
 
-      // window.location.href = `https://wa.me/5566992028229?text=${encodeURIComponent(msg)}`;
-
-      window.open(
-        `https://wa.me/5566992028229?text=${encodeURIComponent(msg)}`,
-        "_blank",
-      );
-
-      limparFormulario();
-
-      setTimeout(() => {
-        router.replace("/sucesso");
-      }, 300);
+      // 👉 agora NÃO abre WhatsApp aqui
+      router.replace(`/sucesso/${data.id}`);
+    } catch (err) {
+      console.error(err);
+      alert("⚠️ Ocorreu um erro ao enviar o cadastro. Tente novamente.");
+    } finally {
+      // 🔥 ISSO EVITA O SPINNER ETERNO
+      setSalvando(false);
     }
-    setSalvando(false);
   };
+
+  //NOVA FUNÇÃO - ENVIAR COM FIREBASE
 
   const inputStyle = (erro?: string) => ({
     border: erro ? "1px solid red" : "1px solid #ccc",

@@ -26,7 +26,10 @@ export async function POST(request: Request) {
 
     const id = await salvarCadastro(dadosParaSalvar);
 
-    return NextResponse.json({ ok: true, id });
+    return NextResponse.json({
+      ok: true,
+      id: id,
+    });
   } catch (error) {
     console.error("erro ao salvar o arquivo", error);
     return NextResponse.json(

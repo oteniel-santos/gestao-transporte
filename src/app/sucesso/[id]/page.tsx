@@ -44,12 +44,13 @@
 "use client";
 
 import { Suspense } from "react";
-import SucessoContent from "./SucessoContent";
+import SucessoContent from "../SucessoContent";
+import SucessoContentFirebase from "../SucessoContentFirebase";
 
 export default function SucessoPage() {
   return (
     <Suspense fallback={<div className="p-6 text-center">Carregando...</div>}>
-      <SucessoContent />
+      <SucessoContentFirebase />
     </Suspense>
   );
 }
