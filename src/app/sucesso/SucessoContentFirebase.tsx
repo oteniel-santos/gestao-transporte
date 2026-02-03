@@ -80,7 +80,7 @@ export default function SucessoContentFirebase() {
   )}`;
 
   const redirecionarWhatsapp = () => {
-    window.location.href = whatsappUrl;
+    window.location.replace(whatsappUrl);
   };
 
   return (
