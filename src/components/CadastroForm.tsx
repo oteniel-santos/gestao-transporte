@@ -76,12 +76,16 @@ export default function CadastroForm() {
     if (linha) return;
     linhaDetectadaRef.current = true;
     detectarLinhaPorGPX(latitude, longitude).then((res) => {
-      if (res) {
-        setLinha(Number(res.linhaId));
-        setMensagemLinha("Linha identificada automaticamente.");
-      } else {
-        setMensagemLinha("Selecione a linha manualmente.");
-      }
+      //PREENCHE SELECT LINHA AUTOMATICAMENTE
+      // if (res) {
+      //   setLinha(Number(res.linhaId));
+      //   setMensagemLinha("Linha identificada automaticamente.");
+      // } else {
+      //   setMensagemLinha("Selecione a linha manualmente.");
+      // }
+
+      //USUÁRIO DEVE SELECIONAR A LINHA MANUALEMTEN
+      setMensagemLinha("Selecione a linha manualmente.");
     });
   }, [latitude, longitude]);
 
@@ -263,13 +267,10 @@ export default function CadastroForm() {
 
       console.log("STATUS API:", res.status);
 
-
-
       const data = await res.json();
       console.log("RETORNO API:", data);
 
-
-            if (!res.ok) {
+      if (!res.ok) {
         throw new Error("Erro ao salvar cadastro");
       }
 
@@ -374,7 +375,10 @@ export default function CadastroForm() {
                       sm:text-sm 
                       ${errors.linha ? "border border-red-500" : ""}`}
             value={linha}
-            onChange={(e) => setLinha(Number(e.target.value))}
+            onChange={(e) => {
+              setLinha(Number(e.target.value));
+              setErrors((prev) => ({ ...prev, linha: undefined }));
+            }}
           >
             <option value="">Selecione uma linha</option>
             {LINHAS.map((l) => (
@@ -387,49 +391,59 @@ export default function CadastroForm() {
           {errors.linha && (
             <p className="text-red-500 text-xs leading-tight">{errors.linha}</p>
           )}
-          {rotaLinha.length > 0 && (
+
+          {/* {rotaLinha.length > 0 && (
             <p className="text-xs ">
               Identificamos automaticamente sua linha. Caso esteja incorreta
               você pode alterar.
             </p>
-          )}
+          )} */}
         </div>
+        <div>
+          <div className="h-96 border rounded flex items-center justify-center bg-gray-50 text-gray-600 text-sm relative overflow-hidden">
+            {localizacaoErro ? (
+              <div>
+                <p className="text-center px-4">
+                  🚫 A localização está bloqueada no navegador.
+                  <br />
+                  Clique no ícone de cadeado na barra de endereço e permita o
+                  acesso.
+                </p>
 
-        <div className="h-96 border rounded flex items-center justify-center bg-gray-50 text-gray-600 text-sm relative overflow-hidden">
-          {localizacaoErro ? (
-            <div>
+                <button
+                  type="button"
+                  onClick={() => obterLocalizacao(false)}
+                  disabled={carregando}
+                  className="w-full border-0 bg-yellow-300 p-2 rounded text-sm text-gray-900 hover:bg-yellow-400 mt-4 font-bold"
+                >
+                  {carregando
+                    ? "Carregando localização..."
+                    : " Tentar usar minha localização novamente"}
+                </button>
+              </div>
+            ) : pontoCasa ? (
+              <MapaLinha
+                rota={rotaLinha}
+                pontoCasa={pontoCasa}
+                tipoMapa={tipoMapa}
+                atualizarPosicaoManual={atualizarPosicaoManual}
+              />
+            ) : (
               <p className="text-center px-4">
-                🚫 A localização está bloqueada no navegador.
-                <br />
-                Clique no ícone de cadeado na barra de endereço e permita o
-                acesso.
+                Obtendo localização automaticamente…
               </p>
+            )}
+          </div>
 
-              <button
-                type="button"
-                onClick={() => obterLocalizacao(false)}
-                disabled={carregando}
-                className="w-full border-0 bg-yellow-300 p-2 rounded text-sm text-gray-900 hover:bg-yellow-400 mt-4 font-bold"
-              >
-                {carregando
-                  ? "Carregando localização..."
-                  : " Tentar usar minha localização novamente"}
-              </button>
-            </div>
-          ) : pontoCasa ? (
-            <MapaLinha
-              rota={rotaLinha}
-              pontoCasa={pontoCasa}
-              tipoMapa={tipoMapa}
-              atualizarPosicaoManual={atualizarPosicaoManual}
-            />
-          ) : (
-            <p className="text-center px-4">
-              Obtendo localização automaticamente…
-            </p>
-          )}
+          <p className="text-xs">
+            Caso a posição da sua casa esteja incorreta,{" "}
+            <b>
+              arraste o marcador azul no mapa acima para o local exato de onde
+              você mora.
+            </b>{" "}
+            Utilize a visão de satélite para facilitar sua visualização{" "}
+          </p>
         </div>
-
         {/* BOTÕES DE CONTROLE DO MAPA */}
         <div className="flex gap-2 justify-center">
           <button
