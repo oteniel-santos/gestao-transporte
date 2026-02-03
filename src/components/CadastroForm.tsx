@@ -392,12 +392,13 @@ export default function CadastroForm() {
             <p className="text-red-500 text-xs leading-tight">{errors.linha}</p>
           )}
 
-          {/* {rotaLinha.length > 0 && (
+          {rotaLinha.length > 0 && (
             <p className="text-xs ">
-              Identificamos automaticamente sua linha. Caso esteja incorreta
-              você pode alterar.
+              Ao selecionar uma linha, o trajeto dela será mostrado no mapa
+              abaixo. Você pode usa-lo para conferir qual a linha mais adequada
+              para você.
             </p>
-          )} */}
+          )}
         </div>
         <div>
           <div className="h-96 border rounded flex items-center justify-center bg-gray-50 text-gray-600 text-sm relative overflow-hidden">
@@ -436,11 +437,11 @@ export default function CadastroForm() {
           </div>
 
           <p className="text-xs">
-            Caso a posição da sua casa esteja incorreta,{" "}
-            <b>
-              arraste o marcador azul no mapa acima para o local exato de onde
-              você mora.
-            </b>{" "}
+            <span className="font-bold">
+              O marcado azul indica a posição da sua casa.
+            </span>{" "}
+            Caso ela esteja incorreta,{" "}
+            <b>arraste o marcador azul para o local exato de onde você mora.</b>{" "}
             Utilize a visão de satélite para facilitar sua visualização{" "}
           </p>
         </div>
