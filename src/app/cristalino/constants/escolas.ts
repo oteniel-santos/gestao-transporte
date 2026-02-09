@@ -1,16 +1,9 @@
 import { Escola } from "@/types/cadastro";
 
 export const ESCOLAS: Escola[] = [
-  { id: 1, nome: "Creche Mundo Mágico" },
-  { id: 2, nome: "Alcides Ferreira Primo" },
-  { id: 3, nome: "Inovação" },
-  { id: 4, nome: "Nhandu" },
-  { id: 5, nome: "André Maggi" },
-  { id: 6, nome: "Água Azul" },
-  { id: 7, nome: "Teles Pires" },
-  { id: 8, nome: "Zita Vilela" },
-  { id: 9, nome: "São João" },
-  { id: 10, nome: "Dante Martins" },
+  { id: 10, nome: "São João" },
+  { id: 11, nome: "Dante Martins" },
+  { id: 12, nome: "Não sei" },
 ];
 
 export function getNomeEscola(escolaId: number | ""): string {
@@ -21,21 +14,12 @@ export function getNomeEscola(escolaId: number | ""): string {
 
 export function selecionarTurmas(idEscola: number): string[] {
   switch (idEscola) {
-    case 3:
+    case 10:
       return ["4º ano", "5º ano", "6º ano"];
-    case 2:
+    case 11:
       return ["Pré II", "1º ano", "2º ano", "3º ano"];
-    case 1:
-      return ["Creche I", "Creche II", "Creche III", "Creche IV", "Pré I"];
-    case 5:
-      return [
-        "7º Ano",
-        "8º Ano",
-        "9º Ano",
-        "1º Ano - Ens. Médio",
-        "2º Ano - Ens. Médio",
-        "3º Ano - Ens. Médio",
-      ];
+    case 12:
+      return ["Não sei"];
     default:
       return [
         "Pré I e II",

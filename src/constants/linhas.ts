@@ -103,5 +103,59 @@ export const LINHAS: Linha[] = [
     motorista: "André",
     telefone: "0",
   },
-  { id: 18, nome: "Não sei", motorista: "Não sei", telefone: "0" },
+  {
+    id: 18,
+    nome: "Faz. Dinâmica",
+    motorista: "Gonçalves",
+    telefone: "5566996373180",
+  },
+  {
+    id: 19,
+    nome: "Barra Norte",
+    motorista: "Marcos",
+    telefone: "5566992824824",
+  },
+  {
+    id: 20,
+    nome: "Chicão",
+    motorista: "Jociel",
+    telefone: "5566992219732",
+  },
+  {
+    id: 21,
+    nome: "Valmori e Martins",
+    motorista: "Antonio",
+    telefone: "5566992058532",
+  },
+  {
+    id: 22,
+    nome: "Jabuti",
+    motorista: "Geraldo",
+    telefone: "5566992819917",
+  },
+  {
+    id: 23,
+    nome: "Linha dos 40",
+    motorista: "Sebastião",
+    telefone: "0",
+  },
+  {
+    id: 24,
+    nome: "Bananal",
+    motorista: "Adriano",
+    telefone: "5566992593302",
+  },
+
+  {
+    id: 25,
+    nome: "Vicinal 2",
+    motorista: "Celio",
+    telefone: "0",
+  },
+  {
+    id: 26,
+    nome: "Gogó da Coruja",
+    motorista: "Nilton",
+    telefone: "66996276128",
+  },
 ];
