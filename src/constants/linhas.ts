@@ -137,7 +137,7 @@ export const LINHAS: Linha[] = [
     id: 23,
     nome: "Linha dos 40",
     motorista: "Sebastião",
-    telefone: "0",
+    telefone: "66992308936",
   },
   {
     id: 24,
@@ -150,7 +150,7 @@ export const LINHAS: Linha[] = [
     id: 25,
     nome: "Vicinal 2",
     motorista: "Celio",
-    telefone: "0",
+    telefone: "66984129557",
   },
   {
     id: 26,
