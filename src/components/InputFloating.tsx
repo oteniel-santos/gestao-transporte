@@ -3,16 +3,22 @@ import { InputHTMLAttributes, forwardRef } from "react";
 interface InputFloatingProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string;
   error?: string;
+  suggestions?: { id: string; nome: string; info?: string }[];
+  onSelectSuggestion?: (suggestion: any) => void;
 }
 
 export const InputFloating = forwardRef<HTMLInputElement, InputFloatingProps>(
-  function InputFloating({ label, error, className = "", ...props }, ref) {
+  function InputFloating(
+    { label, error, suggestions, onSelectSuggestion, className = "", ...props },
+    ref,
+  ) {
     return (
       <div className="relative w-full">
         <input
           ref={ref}
           {...props}
           placeholder=" "
+          autoComplete="off"
           className={`
           peer
           w-full
@@ -56,6 +62,26 @@ export const InputFloating = forwardRef<HTMLInputElement, InputFloatingProps>(
         >
           {label}
         </label>
+
+        {suggestions && suggestions.length > 0 && (
+          <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-auto">
+            {suggestions.map((s) => (
+              <button
+                key={s.id}
+                type="button"
+                onMouseDown={() => onSelectSuggestion?.(s)}
+                className="w-full text-left px-4 py-2 hover:bg-indigo-50 transition border-b border-gray-100 last:border-0"
+              >
+                <div className="text-sm font-semibold text-gray-900 uppercase">
+                  {s.nome}
+                </div>
+                {s.info && (
+                  <div className="text-xs text-gray-500 mt-0.5">{s.info}</div>
+                )}
+              </button>
+            ))}
+          </div>
+        )}
 
         {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
       </div>

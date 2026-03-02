@@ -1,8 +1,13 @@
 "use client";
 import { Filho } from "@/types/cadastro";
 import { ESCOLAS, selecionarTurmas } from "@/constants/escolas";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { InputFloating } from "./InputFloating";
+import {
+  useStudentAutocomplete,
+  StudentSuggestion,
+} from "@/hooks/useStudentAutocomplete";
+import { mapOmegaSchoolToId, normalizeOmegaTurma } from "@/utils/omega-mapper";
 
 type AlunosFormProps = {
   filhos: Filho[];
@@ -19,6 +24,11 @@ export default function AlunosForm({
   limparErroFilho,
   alunoRefs,
 }: AlunosFormProps) {
+  const { search } = useStudentAutocomplete();
+  const [suggestions, setSuggestions] = useState<{
+    [key: number]: StudentSuggestion[];
+  }>({});
+
   const adicionarFilho = () => {
     setFilhos([
       ...filhos,
@@ -33,6 +43,30 @@ export default function AlunosForm({
     const novaLista = [...filhos];
     novaLista[index] = { ...novaLista[index], [campo]: valor };
     setFilhos(novaLista);
+  };
+
+  const handleSelectStudent = (index: number, student: StudentSuggestion) => {
+    const schoolId = mapOmegaSchoolToId(student.escola);
+    const normalizedTurma = normalizeOmegaTurma(student.turma);
+
+    const novaLista = [...filhos];
+    novaLista[index] = {
+      ...novaLista[index],
+      nome: student.nome,
+      escolaId: schoolId,
+      turma: normalizedTurma,
+      omegaId: student.id,
+      omegaResponsavel: student.responsavel,
+    };
+    setFilhos(novaLista);
+
+    // Clear suggestions
+    setSuggestions((prev) => ({ ...prev, [index]: [] }));
+
+    // Clear errors
+    limparErroFilho(index, "nome");
+    if (schoolId) limparErroFilho(index, "escolaId");
+    if (normalizedTurma) limparErroFilho(index, "turma");
   };
 
   return (
@@ -50,12 +84,48 @@ export default function AlunosForm({
               label="Nome do Aluno"
               value={filho.nome}
               error={errors?.filhos?.[index]?.nome}
+              suggestions={suggestions[index]?.map((s) => ({
+                id: s.id,
+                nome: s.nome,
+                info: `Escola: ${s.escola} | Turma: ${s.turma} | Resp: ${s.responsavel}`,
+              }))}
+              onSelectSuggestion={(s) => {
+                const student = suggestions[index].find((std) => std.id === s.id);
+                if (student) handleSelectStudent(index, student);
+              }}
               onChange={(e) => {
-                atualizarFilho(index, "nome", e.target.value);
+                const val = e.target.value;
+                atualizarFilho(index, "nome", val);
                 limparErroFilho(index, "nome");
+
+                // Search for suggestions
+                const results = search(val);
+                setSuggestions((prev) => ({ ...prev, [index]: results }));
+              }}
+              onBlur={() => {
+                // Delay clearing to allow onMouseDown to fire
+                setTimeout(() => {
+                  setSuggestions((prev) => ({ ...prev, [index]: [] }));
+                }, 200);
               }}
             />
           </div>
+
+          {(filho.omegaId || filho.omegaResponsavel) && (
+            <div className="mt-2 text-xs bg-cyan-50 p-2 rounded border border-cyan-100 space-y-1">
+              {filho.omegaId && (
+                <div className="text-cyan-800">
+                  <span className="font-bold">ID Ômega:</span> {filho.omegaId}
+                </div>
+              )}
+              {filho.omegaResponsavel && (
+                <div className="text-cyan-800">
+                  <span className="font-bold">Responsável (Ômega):</span>{" "}
+                  {filho.omegaResponsavel}
+                </div>
+              )}
+            </div>
+          )}
 
           <div className="mt-4">
             <select

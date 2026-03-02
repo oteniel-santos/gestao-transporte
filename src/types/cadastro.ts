@@ -3,6 +3,8 @@ export type Filho = {
   escolaId: number | "";
   escolaNome: string;
   turma: string;
+  omegaId?: string;
+  omegaResponsavel?: string;
 };
 
 export type Errors = {
