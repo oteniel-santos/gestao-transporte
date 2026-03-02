@@ -4,11 +4,15 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "extract-omega": "ts-node --compiler-options '{\"module\":\"commonjs\"}' scripts/extract_omega.ts",
+    "predev": "npm run extract-omega",
+    "prebuild": "npm run extract-omega",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
   },
   "dependencies": {
+    "csv-parse": "^6.1.0",
     "firebase": "^12.8.0",
     "firebase-admin": "^13.6.0",
     "idb": "^8.0.3",
@@ -21,6 +25,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/csv-parse": "^1.2.5",
     "@types/leaflet": "^1.9.21",
     "@types/next-pwa": "^5.6.9",
     "@types/node": "^20",
@@ -29,6 +34,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
     "tailwindcss": "^4",
+    "ts-node": "^10.9.2",
     "typescript": "^5"
   }
 }
